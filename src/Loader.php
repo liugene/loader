@@ -124,7 +124,6 @@ class Loader
     {
         //加载composer等扩展自动加载机制
         $this->loadExtendAutoload();
-        $this->loadFile();
         //psr4自动加载机制排序
         $this->sortPsr4ByArrAyFirstKey();
         //psr0自动加载机制排序
@@ -138,6 +137,7 @@ class Loader
         } else {
             spl_autoload_register(array(__CLASS__, $this->_autoload_func));
         }
+        $this->loadFile();
         return $this;
     }
 
