@@ -34,23 +34,23 @@ class Loader
     private $_autoload_func = ['classMapAutoload','namespaceAutoload','loaderClass'];
 
     //composer目录
-    static private $vendor_path = VENDOR_PATH;
+    static private $vendor_path;
 
     //类库映射配置文件目录
-    static private $load_path = LOAD_PATH;
+    static private $load_path;
 
     //框架目录
-    static private $framework_path = FRAMEWORK_PATH;
+    static private $framework_path;
 
     //文件后缀名
-    static private $ext = EXT;
+    static private $ext;
 
     static private $_instance;
 
     //扩展类库目录
-    static private $extend_path = EXTEND_PATH;
+    static private $extend_path;
 
-    static public function register(Loader $autoload)
+    public function register(Loader $autoload)
     {
         return $autoload;
     }
@@ -311,7 +311,7 @@ class Loader
         if(array_key_exists($class_name[0],self::$_sort_psr0_map)){
             foreach(self::$_sort_psr0_map[$class_name[0]] as $prefix){
                 if(strpos($class_name,$prefix) === 0){
-                    $filename = str_replace('/', '\\',self::$_map['autoload_namespace_psr0'][$prefix][0]) . strrchr($class_name,'\\') . EXT;
+                    $filename = str_replace('/', '\\',self::$_map['autoload_namespace_psr0'][$prefix][0]) . strrchr($class_name,'\\') . self::$ext;
                     if(file_exists($filename)){
                         __require_file($filename);
                         return true;
@@ -324,7 +324,7 @@ class Loader
 
     static private function findExtends($class_name)
     {
-        $filename = str_replace('/', '\\',self::$extend_path . $class_name) . EXT;
+        $filename = str_replace('/', '\\',self::$extend_path . $class_name) . self::$ext;
         if(file_exists($filename)){
             __require_file($filename);
             return true;
