@@ -14,7 +14,7 @@
 
 namespace linkphp\loader;
 
-use linkphp\boot\Exception;
+use linkphp\Exception;
 
 class Loader
 {
