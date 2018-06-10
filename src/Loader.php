@@ -14,7 +14,7 @@
 
 namespace linkphp\loader;
 
-use linkphp\Exception;
+use framework\Exception;
 
 class Loader
 {
@@ -245,11 +245,21 @@ class Loader
     }
 
     /**
-     * 注册命名空间名
-     */
-    static public function addNamespace($namespace,$path='')
+ * 注册Psr4命名空间名
+ */
+    static public function addNamespacePsr4($namespace,$path='')
     {
-        return self::$_map = $namespace;
+        self::assertPsr4NameSpaceAvailable($namespace);
+        return self::$_map['autoload_namespace_psr4'][$namespace] = $path;
+    }
+
+    /**
+     * 注册Psr4命名空间名
+     */
+    static public function addNamespacePsr0($namespace,$path='')
+    {
+        self::assertPsr0NameSpaceAvailable($namespace);
+        return self::$_map['autoload_namespace_psr0'][$namespace] = $path;
     }
 
     /**
@@ -286,13 +296,19 @@ class Loader
                 if(strpos($class_name,$prefix) === 0){
                     //尝试补位查找类文件
 
-                    $full_filename = str_replace('\\','/',str_replace('\\', '/',self::$_map['autoload_namespace_psr4'][$prefix][0]) . str_replace($prefix,'\\',$class_name) . self::$ext);
+                    $full_filename = str_replace('\\','/',
+                        str_replace('\\', '/'
+                            ,self::$_map['autoload_namespace_psr4'][$prefix][0]) .
+                        str_replace($prefix,'\\',$class_name) . self::$ext);
 
                     if(is_file($full_filename)){
                         __require_file($full_filename);
                         return true;
                     } else {
-                        $filename = str_replace('\\','/',str_replace('\\', '/',self::$_map['autoload_namespace_psr4'][$prefix][0]) . strrchr($class_name,'\\') . self::$ext);
+                        $filename = str_replace('\\','/',
+                            str_replace('\\', '/'
+                                ,self::$_map['autoload_namespace_psr4'][$prefix][0]) .
+                            strrchr($class_name,'\\') . self::$ext);
 
                         if(file_exists($filename)){
                             __require_file($filename);
@@ -311,7 +327,9 @@ class Loader
         if(array_key_exists($class_name[0],self::$_sort_psr0_map)){
             foreach(self::$_sort_psr0_map[$class_name[0]] as $prefix){
                 if(strpos($class_name,$prefix) === 0){
-                    $filename = str_replace('/', '\\',self::$_map['autoload_namespace_psr0'][$prefix][0]) . strrchr($class_name,'\\') . self::$ext;
+                    $filename = str_replace('/', '\\'
+                            ,self::$_map['autoload_namespace_psr0'][$prefix][0]) .
+                        strrchr($class_name,'\\') . self::$ext;
                     if(file_exists($filename)){
                         __require_file($filename);
                         return true;
@@ -361,6 +379,26 @@ class Loader
             $newPsr0Namespace[$key[0]][] = $key;
         }
         self::$_sort_psr0_map = $newPsr0Namespace;
+    }
+
+    static private function assertPsr4NameSpaceAvailable($namespace)
+    {
+        if(!is_string($namespace) || empty($namespace) || isset(self::$_map['autoload_namespace_psr4'][$namespace])){
+            /**
+             * 不合法抛出 异常
+             */
+            throw new Exception('命名空间错误!');
+        }
+    }
+
+    static private function assertPsr0NameSpaceAvailable($namespace)
+    {
+        if(!is_string($namespace) || empty($namespace) || isset(self::$_map['autoload_namespace_psr0'][$namespace])){
+            /**
+             * 不合法抛出 异常
+             */
+            throw new Exception('命名空间错误!');
+        }
     }
 
 }
