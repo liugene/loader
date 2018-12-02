@@ -219,23 +219,43 @@ class Loader
     }
 
     /*追加扩展Psr0标准类库自动加载*/
-    private function addExtendClassPsr0($namespace){
-        self::$_map['autoload_namespace_psr0'] = array_merge(self::$_map['autoload_namespace_psr0'],$namespace);
+    private function addExtendClassPsr0($namespace)
+    {
+
+        self::$_map['autoload_namespace_psr0'] = array_merge(
+            self::$_map['autoload_namespace_psr0']
+            ,$namespace
+        );
     }
 
     /*追加扩展Psr4标准类库自动加载*/
-    private function addExtendClassPsr4($namespace){
-        self::$_map['autoload_namespace_psr4'] = array_merge(self::$_map['autoload_namespace_psr4'],$namespace);
+    private function addExtendClassPsr4($namespace)
+    {
+
+        self::$_map['autoload_namespace_psr4'] = array_merge(
+            self::$_map['autoload_namespace_psr4']
+            ,$namespace
+        );
     }
 
     /*追加扩展标准类库自动映射自动加载*/
-    private function addExtendClassMap($class_map){
-        self::$_map['class_autoload_map'] = array_merge(self::$_map['class_autoload_map'],$class_map);
+    private function addExtendClassMap($class_map)
+    {
+
+        self::$_map['class_autoload_map'] = array_merge(
+            self::$_map['class_autoload_map']
+            ,$class_map
+        );
     }
 
     /*追加扩展标准类库自动映射自动加载*/
-    private function addExtendFile($includeFiles){
-        self::$_map['autoload_namespace_file'] = array_merge(self::$_map['autoload_namespace_file'],$includeFiles);
+
+    private function addExtendFile($includeFiles)
+    {
+        self::$_map['autoload_namespace_file'] = array_merge(
+            self::$_map['autoload_namespace_file']
+            ,$includeFiles
+        );
     }
 
     public function import($file)
@@ -245,8 +265,8 @@ class Loader
     }
 
     /**
- * 注册Psr4命名空间名
- */
+     * 注册Psr4命名空间名
+     */
     static public function addNamespacePsr4($namespace,$path='')
     {
         self::assertPsr4NameSpaceAvailable($namespace);
@@ -254,12 +274,53 @@ class Loader
     }
 
     /**
-     * 注册Psr4命名空间名
+     * 注册Psr0命名空间名
      */
     static public function addNamespacePsr0($namespace,$path='')
     {
         self::assertPsr0NameSpaceAvailable($namespace);
         return self::$_map['autoload_namespace_psr0'][$namespace] = $path;
+    }
+
+    /**
+     * 注册类加载
+     */
+    static public function addClassMap($class,$path='')
+    {
+
+        if(is_array($class)){
+
+            foreach ($class as $key => $value){
+                self::assertClassMapAvailable($key);
+                self::$_map['class_autoload_map'][$key] = $value;
+            }
+
+            return;
+        }
+
+        self::assertClassMapAvailable($class);
+        return self::$_map['class_autoload_map'][$class] = $path;
+
+    }
+
+    /**
+     * 注册文件加载
+     */
+    static public function addFileMap($filename,$path='')
+    {
+
+        if(is_array($filename)){
+
+            foreach ($filename as $key => $value){
+                self::assertFileMapAvailable($key);
+                return self::$_map['autoload_namespace_file'][$key] = $value;
+            }
+
+            return;
+        }
+
+        self::assertFileMapAvailable($filename);
+        return self::$_map['autoload_namespace_file'][$filename] = $path;
     }
 
     /**
@@ -387,7 +448,7 @@ class Loader
             /**
              * 不合法抛出 异常
              */
-            throw new Exception('命名空间错误!');
+            throw new Exception($namespace . '命名空间错误!');
         }
     }
 
@@ -397,7 +458,27 @@ class Loader
             /**
              * 不合法抛出 异常
              */
-            throw new Exception('命名空间错误!');
+            throw new Exception($namespace . '命名空间错误!');
+        }
+    }
+
+    static private function assertClassMapAvailable($class)
+    {
+        if(!is_string($class) || empty($class) || isset(self::$_map['class_autoload_map'][$class])){
+            /**
+             * 不合法抛出 异常
+             */
+            throw new Exception($class . '类已存在!');
+        }
+    }
+
+    static private function assertFileMapAvailable($filename)
+    {
+        if(!is_string($filename) || empty($filename) || isset(self::$_map['autoload_namespace_file'][$filename])){
+            /**
+             * 不合法抛出 异常
+             */
+            throw new Exception($filename . '文件名已存在!');
         }
     }
 
